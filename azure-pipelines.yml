@@ -1,0 +1,48 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+- dev 
+
+resources:
+- repo: self
+
+variables:
+  imageName: 'image-$(Build.Repository.Name):$(Build.SourceBranchName)-$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build image & Deploy
+  jobs:
+  - job: Build
+    displayName: Build & Deploy
+    pool:
+      vmImage: ubuntu-latest
+  steps:
+    -
+- task: Docker@0
+  displayName: 'Build an image'
+  inputs:
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: 'Free Trial (a7bc07b0-2a0b-4a65-b293-ac57da3104ae)'
+    azureContainerRegistry: '{"loginServer":"khushbucontainer.azurecr.io", "id" : "/subscriptions/a7bc07b0-2a0b-4a65-b293-ac57da3104ae/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/khushbucontainer"}'
+    action: 'Build an image'
+    dockerFile: 'Dockerfile'
+    imageName: '$(imageName)' 
+  steps:
+    -
+- task: Docker@0
+  displayName: 'Push an image'
+  inputs:
+    containerregistrytype: 'Azure Container Registry'
+    azureSubscription: 'Free Trial (a7bc07b0-2a0b-4a65-b293-ac57da3104ae)'
+    azureContainerRegistry: '{"loginServer":"khushbucontainer.azurecr.io", "id" : "/subscriptions/a7bc07b0-2a0b-4a65-b293-ac57da3104ae/resourceGroups/myResourceGroup/providers/Microsoft.ContainerRegistry/registries/khushbucontainer"}'
+    action: 'Push an image'
+    imageName: '$(imageName)'
+  steps:
+  -
+-
+-  
+  
